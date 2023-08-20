@@ -1,6 +1,7 @@
 const db = require('./db/connection');
 const inquirer = require('inquirer');
 const Queries = require('./db/queries');
+const AsciiTable = require('ascii-table');
 
 
 db.then( connection => {
@@ -34,12 +35,38 @@ db.then( connection => {
 
           dataAccess.getDepartments()
             .then(results => {
+              const matrix = [];
+              const rows = results[0];
+              for (var i = 0; i < rows.length; i++) {
+                matrix.push( [ rows[i].id, rows[i].name ] );
+              }
+
               console.log(results[0]);
+              console.log(matrix);
+
+              const table = new AsciiTable('Departments');
+              table
+                .setHeading('ID', 'Name')
+                .addRowMatrix(matrix);
+              
+              console.log(table.toString());
             });
           break;
         case "view all roles":
           dataAccess.getRoles()
-            .then(results => console.log(results[0]));
+            .then(results => {
+              const matrix = [];
+              for (var i = 0; i < results[0].length; i++) {
+                matrix.push( [ results[0][i].id, results[0][i].title, results[0][i].salary, results[0][i].name ] );
+              }
+
+              const table = new AsciiTable('Roles');
+              table
+                .setHeading('ID', 'Title', 'Salary', 'Department Name')
+                .addRowMatrix(matrix);
+              
+              console.log(table.toString());
+            });
           break;
         case "view all employees":
           break;

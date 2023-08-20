@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/queendoescode/employee-tracker-tool#readme",
   "dependencies": {
+    "ascii-table": "^0.0.9",
     "inquirer": "^8.2.4",
     "mysql2": "^3.6.0"
   }
