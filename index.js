@@ -33,16 +33,13 @@ db.then( connection => {
           // The returned rows is first item, and table metadata is the 2nd row. 
           // We only need to look at the returned rows.
 
-          dataAccess.getDepartments()
+          return dataAccess.getDepartments()
             .then(results => {
               const matrix = [];
               const rows = results[0];
               for (var i = 0; i < rows.length; i++) {
                 matrix.push( [ rows[i].id, rows[i].name ] );
               }
-
-              console.log(results[0]);
-              console.log(matrix);
 
               const table = new AsciiTable('Departments');
               table
@@ -53,7 +50,7 @@ db.then( connection => {
             });
           break;
         case "view all roles":
-          dataAccess.getRoles()
+          return dataAccess.getRoles()
             .then(results => {
               const matrix = [];
               for (var i = 0; i < results[0].length; i++) {
@@ -69,11 +66,9 @@ db.then( connection => {
             });
           break;
         case "view all employees":
-          dataAccess.getEmployees()
+          return dataAccess.getEmployees()
             .then(results => {
               const matrix = [];
-              // | id | first_name | last_name | title             | department | salary | first_name | last_name |
-
               for (var i = 0; i < results[0].length; i++) {
                 const row = results[0][i];
                 matrix.push( [ row.id, `${row.first_name} ${row.last_name}`, row.title, 
