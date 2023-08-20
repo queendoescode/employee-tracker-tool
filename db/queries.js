@@ -1,0 +1,30 @@
+class Queries {
+
+  constructor (db) {
+    this.db = db;
+  }
+
+  getDepartments() {
+    return this.db.query('SELECT * FROM department');
+  }
+
+  getRoles() {
+    return this.db.query(
+      `SELECT role.id, role.title, role.salary, department.name 
+       FROM role JOIN department ON department.id = department_id`);
+  }
+
+  getEmployees() {
+    return this.db.query(
+      `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, 
+              role.salary, manager.first_name AS mgr_first_name, manager.last_name AS mgr_last_name
+       FROM employee AS e 
+            JOIN role ON role.id = e.role_id 
+            JOIN department ON department.id = role.department_id 
+            LEFT JOIN employee AS manager ON manager.id = e.manager_id
+      `
+    );
+  }
+}
+
+module.exports = Queries;

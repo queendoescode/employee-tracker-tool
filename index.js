@@ -69,6 +69,24 @@ db.then( connection => {
             });
           break;
         case "view all employees":
+          dataAccess.getEmployees()
+            .then(results => {
+              const matrix = [];
+              // | id | first_name | last_name | title             | department | salary | first_name | last_name |
+
+              for (var i = 0; i < results[0].length; i++) {
+                const row = results[0][i];
+                matrix.push( [ row.id, `${row.first_name} ${row.last_name}`, row.title, 
+                               row.department, row.salary, `${row.mgr_first_name || ''} ${row.mgr_last_name || ''}` ] );
+              }
+
+              const table = new AsciiTable('Employees');
+              table
+                .setHeading('ID', 'Name', 'Title', 'Department', 'Salary', 'Manager Name')
+                .addRowMatrix(matrix);
+              
+              console.log(table.toString());
+            });
           break;
         case "add a department":
           break;
