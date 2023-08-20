@@ -31,6 +31,12 @@ class Queries {
       'INSERT INTO department (name) VALUES (?)', name
     );
   }
+
+  addRole(title, salary, departmentId) {
+    return this.db.query(
+      'INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, departmentId]
+    );
+  }
 }
 
 module.exports = Queries;

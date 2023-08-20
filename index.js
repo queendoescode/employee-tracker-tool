@@ -98,7 +98,29 @@ db.then( connection => {
             });
           break;
         case "add a role":
-          break;
+          return inquirer
+            .prompt([
+              {
+                name:"roleTitle", 
+                message:"What is the title of the role you want to add?",
+                type: "text"
+              },
+              {
+                name:"salary", 
+                message:"What is the salary of this role?",
+                type: "text"
+              },
+              {
+                name:"departmentId", 
+                message:"What is the ID of the department of this role?",
+                type: "text"
+              }
+            ])
+            .then(answers => {
+              dataAccess.addRole(answers.roleTitle, answers.salary, answers.departmentId)
+                .then(result => console.log(`Role "${answers.roleTitle}" has been added.`));
+            });
+          
         case "add an employee":
           break; 
         case "update an employee role":
