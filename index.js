@@ -89,6 +89,18 @@ db.then( connection => {
             });
           break;
         case "add a department":
+          return inquirer
+            .prompt([
+              {
+                name:"departmentName", 
+                message:"What is the name of the department you want to add?",
+                type: "text"
+              }
+            ])
+            .then(answers => {
+              dataAccess.addDepartment(answers.departmentName)
+                .then(result => console.log(`Department "${answers.departmentName}" has been added.`));
+            });
           break;
         case "add a role":
           break;

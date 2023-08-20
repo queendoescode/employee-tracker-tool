@@ -25,6 +25,12 @@ class Queries {
       `
     );
   }
+
+  addDepartment(name) {
+    return this.db.query(
+      'INSERT INTO department (name) VALUES (?)', name
+    );
+  }
 }
 
 module.exports = Queries;
