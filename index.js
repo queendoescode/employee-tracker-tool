@@ -181,12 +181,52 @@ db.then( connection => {
                   dataAccess.addEmployee(answers.firstName, answers.lastName, roleRow.id, managerRow.id)
                     .then(result => console.log(`Employee "${answers.firstName} ${answers.lastName}" has been added.`));
                 });
-              })
+              });
             }
           )
 
         case "update an employee role":
-          break;
+          return dataAccess.getRoles()
+          .then( roleResults => {
+              return dataAccess.getEmployees()
+              .then( employeeResults => {
+                const roles = roleResults[0];
+                const roleTitles = [];
+                for (var i = 0; i < roles.length; i++) {
+                  roleTitles.push(roles[i].title);
+                }
+
+                const employees = employeeResults[0];
+                const employeeNames = [];
+                for (var i = 0; i < employees.length; i++) {
+                  employeeNames.push(`${employees[i].first_name} ${employees[i].last_name}`);
+                }
+
+                return inquirer
+                .prompt([
+                  {
+                    name:"employeeName", 
+                    message:"Select an employee to update:",
+                    type: "list",
+                    choices: employeeNames
+                  },
+                  {
+                    name:"roleTitle", 
+                    message:"What is the employee's new role?",
+                    type: "list",
+                    choices: roleTitles
+                  },
+                ])
+                .then(answers => {
+                  const roleRow = roles.find(role => role.title === answers.roleTitle);
+                  const employeeRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.employeeName);
+                  dataAccess.updateEmployeeRole(employeeRow.id, roleRow.id)
+                    .then(result => console.log(`Employee "${answers.employeeName}" has been updated.`));
+                });
+              });
+            }
+          )
+
       }
   
     })
