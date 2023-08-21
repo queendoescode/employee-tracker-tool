@@ -41,7 +41,8 @@ db.then( connection => {
           "view employees by manager",
           "delete department",
           "delete role",
-          "delete employee"
+          "delete employee",
+          "view department budget"
         ]
       }
     ])
@@ -401,6 +402,37 @@ db.then( connection => {
                 dataAccess.deleteEmployee(employeeRow.id)
                   .then(results => {
                     console.log(`Employee ${answers.employeeName} has been deleted`);
+                  });
+              });
+            }
+          );
+
+        case "view department budget":
+          return dataAccess.getDepartments()
+          .then(
+            result => {
+              const departments = result[0];
+              const departmentNames = [];
+              for (var i = 0; i < departments.length; i++) {
+                departmentNames.push(departments[i].name);
+              }
+              return inquirer
+              .prompt([
+                {
+                  name:"departmentName", 
+                  message:"Show budget for which department?",
+                  type: "list",
+                  choices: departmentNames
+                }
+              ])
+              .then(answers => {
+                dataAccess.getDepartmentBudget(answers.departmentName)
+                  .then(results => {
+                    const table = new AsciiTable();
+                    table
+                      .setHeading(`Budget for Department ${answers.departmentName}`)
+                      .addRowMatrix([[results[0][0].budget]]);
+                    console.log(table.toString());
                   });
               });
             }

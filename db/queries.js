@@ -106,6 +106,20 @@ class Queries {
       [managerId, employeeId]
     );
   }
+
+  getDepartmentBudget(departmentName) {
+    /* View the total utilized budget of a department&mdash;in other words, 
+       the combined salaries of all employees in that department.*/
+    return this.db.query(
+      `SELECT SUM( role.salary ) AS budget
+       FROM employee
+            JOIN role  ON employee.role_id = role.id
+            JOIN department ON department.id = role.department_id
+       WHERE department.name = ?
+      `,
+      departmentName
+    )
+  }
 }
 
 module.exports = Queries;
