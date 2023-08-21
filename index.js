@@ -3,6 +3,21 @@ const inquirer = require('inquirer');
 const Queries = require('./db/queries');
 const AsciiTable = require('ascii-table');
 
+function formatEmployeeResults(results, tableTitle) {
+  const matrix = [];
+  for (var i = 0; i < results[0].length; i++) {
+    const row = results[0][i];
+    matrix.push( [ row.id, `${row.first_name} ${row.last_name}`, row.title, 
+                   row.department, row.salary, `${row.mgr_first_name || ''} ${row.mgr_last_name || ''}` ] );
+  }
+
+  const table = new AsciiTable(tableTitle);
+  table
+    .setHeading('ID', 'Name', 'Title', 'Department', 'Salary', 'Manager Name')
+    .addRowMatrix(matrix);
+  
+  console.log(table.toString());
+}
 
 db.then( connection => {
   const dataAccess = new Queries(connection);
@@ -21,7 +36,8 @@ db.then( connection => {
           "add a role", 
           "add an employee", 
           "update an employee role",
-          "update an employee manager"
+          "update an employee manager",
+          "view employees by department"
         ]
       }
     ])
@@ -69,19 +85,7 @@ db.then( connection => {
         case "view all employees":
           return dataAccess.getEmployees()
             .then(results => {
-              const matrix = [];
-              for (var i = 0; i < results[0].length; i++) {
-                const row = results[0][i];
-                matrix.push( [ row.id, `${row.first_name} ${row.last_name}`, row.title, 
-                               row.department, row.salary, `${row.mgr_first_name || ''} ${row.mgr_last_name || ''}` ] );
-              }
-
-              const table = new AsciiTable('Employees');
-              table
-                .setHeading('ID', 'Name', 'Title', 'Department', 'Salary', 'Manager Name')
-                .addRowMatrix(matrix);
-              
-              console.log(table.toString());
+              formatEmployeeResults(results, 'Employees')
             });
 
         case "add a department":
@@ -132,7 +136,7 @@ db.then( connection => {
                   .then(result => console.log(`Role "${answers.roleTitle}" has been added.`));
               });
             }
-          )
+          );
         
         case "add an employee":
           return dataAccess.getRoles()
@@ -257,6 +261,33 @@ db.then( connection => {
                 const managerRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.managerName);
                 dataAccess.updateEmployeeManager(employeeRow.id, managerRow.id)
                   .then(result => console.log(`Employee "${answers.employeeName}" has been updated.`));
+              });
+            }
+          );
+
+        case "view employees by department":
+          return dataAccess.getDepartments()
+          .then(
+            result => {
+              const departments = result[0];
+              const departmentNames = [];
+              for (var i = 0; i < departments.length; i++) {
+                departmentNames.push(departments[i].name);
+              }
+              return inquirer
+              .prompt([
+                {
+                  name:"departmentName", 
+                  message:"Show employees for which department?",
+                  type: "list",
+                  choices: departmentNames
+                }
+              ])
+              .then(answers => {
+                dataAccess.getEmployeesByDepartment(answers.departmentName)
+                  .then(results => {
+                    formatEmployeeResults(results, `Employees in department ${answers.departmentName}`);
+                  });
               });
             }
           );

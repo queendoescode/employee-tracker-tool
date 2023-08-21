@@ -26,6 +26,20 @@ class Queries {
     );
   }
 
+  getEmployeesByDepartment(departmentName) {
+    return this.db.query(
+      `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, 
+              role.salary, manager.first_name AS mgr_first_name, manager.last_name AS mgr_last_name
+       FROM employee AS e 
+            JOIN role ON role.id = e.role_id 
+            JOIN department ON department.id = role.department_id 
+            LEFT JOIN employee AS manager ON manager.id = e.manager_id
+       WHERE department.name = ?
+      `,
+      departmentName
+    );
+  }
+
   addDepartment(name) {
     return this.db.query(
       'INSERT INTO department (name) VALUES (?)', name
