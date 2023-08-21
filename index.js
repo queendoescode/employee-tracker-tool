@@ -38,7 +38,10 @@ db.then( connection => {
           "update an employee role",
           "update an employee manager",
           "view employees by department",
-          "view employees by manager"
+          "view employees by manager",
+          "delete department",
+          "delete role",
+          "delete employee"
         ]
       }
     ])
@@ -189,7 +192,7 @@ db.then( connection => {
                 });
               });
             }
-          )
+          );
 
         case "update an employee role":
           return dataAccess.getRoles()
@@ -316,6 +319,88 @@ db.then( connection => {
                 dataAccess.getEmployeesByManager(managerRow.id)
                   .then(results => {
                     formatEmployeeResults(results, `Employees under manager ${answers.managerName}`);
+                  });
+              });
+            }
+          );
+
+        case "delete department":
+          return dataAccess.getDepartments()
+          .then(
+            result => {
+              const departments = result[0];
+              const departmentNames = [];
+              for (var i = 0; i < departments.length; i++) {
+                departmentNames.push(departments[i].name);
+              }
+              return inquirer
+              .prompt([
+                {
+                  name:"departmentName", 
+                  message:"Delete which department?",
+                  type: "list",
+                  choices: departmentNames
+                }
+              ])
+              .then(answers => {
+                dataAccess.deleteDepartment(answers.departmentName)
+                  .then(results => {
+                    console.log(`Department ${answers.departmentName} has been deleted`);
+                  });
+              });
+            }
+          );
+
+        case "delete role":
+          return dataAccess.getRoles()
+          .then(
+            result => {
+              const roles = result[0];
+              const roleNames = [];
+              for (var i = 0; i < roles.length; i++) {
+                roleNames.push(roles[i].title);
+              }
+              return inquirer
+              .prompt([
+                {
+                  name:"roleName", 
+                  message:"Delete which role?",
+                  type: "list",
+                  choices: roleNames
+                }
+              ])
+              .then(answers => {
+                dataAccess.deleteRole(answers.roleName)
+                  .then(results => {
+                    console.log(`Role ${answers.roleName} has been deleted`);
+                  });
+              });
+            }
+          );
+
+        case "delete employee":
+          return dataAccess.getEmployees()
+          .then( employeeResults => {
+              const employees = employeeResults[0];
+              const employeeNames = [];
+              for (var i = 0; i < employees.length; i++) {
+                employeeNames.push(`${employees[i].first_name} ${employees[i].last_name}`);
+              }
+
+              return inquirer
+              .prompt([
+                {
+                  name:"employeeName", 
+                  message:"Delete which employee?",
+                  type: "list",
+                  choices: employeeNames
+                },
+              ])
+              .then(answers => {
+                const employeeRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.employeeName);
+                dataAccess.deleteEmployee(employeeRow.id)
+                  .then(results => {
+                    console.log(`Employee ${answers.employeeName} has been deleted`);
                   });
               });
             }

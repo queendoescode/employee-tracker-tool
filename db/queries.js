@@ -60,9 +60,21 @@ class Queries {
     );
   }
 
+  deleteDepartment(name) {
+    return this.db.query(
+      'DELETE FROM department WHERE name = ?', name
+    );
+  }
+
   addRole(title, salary, departmentId) {
     return this.db.query(
       'INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, departmentId]
+    );
+  }
+
+  deleteRole(title) {
+    return this.db.query(
+      'DELETE FROM role WHERE title = ?', title
     );
   }
 
@@ -70,6 +82,12 @@ class Queries {
     return this.db.query(
       'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', 
       [firstName, lastName, roleId, managerId]
+    );
+  }
+
+  deleteEmployee(employeeId) {
+    return this.db.query(
+      'DELETE FROM employee WHERE id = ?', employeeId
     );
   }
 
