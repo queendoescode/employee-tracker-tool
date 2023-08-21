@@ -37,7 +37,8 @@ db.then( connection => {
           "add an employee", 
           "update an employee role",
           "update an employee manager",
-          "view employees by department"
+          "view employees by department",
+          "view employees by manager"
         ]
       }
     ])
@@ -287,6 +288,34 @@ db.then( connection => {
                 dataAccess.getEmployeesByDepartment(answers.departmentName)
                   .then(results => {
                     formatEmployeeResults(results, `Employees in department ${answers.departmentName}`);
+                  });
+              });
+            }
+          );
+
+        case "view employees by manager":
+          return dataAccess.getEmployees()
+          .then( employeeResults => {
+              const employees = employeeResults[0];
+              const employeeNames = [];
+              for (var i = 0; i < employees.length; i++) {
+                employeeNames.push(`${employees[i].first_name} ${employees[i].last_name}`);
+              }
+
+              return inquirer
+              .prompt([
+                {
+                  name:"managerName", 
+                  message:"Show employees under which manager?",
+                  type: "list",
+                  choices: employeeNames
+                },
+              ])
+              .then(answers => {
+                const managerRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.managerName);
+                dataAccess.getEmployeesByManager(managerRow.id)
+                  .then(results => {
+                    formatEmployeeResults(results, `Employees under manager ${answers.managerName}`);
                   });
               });
             }
