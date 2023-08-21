@@ -20,7 +20,8 @@ db.then( connection => {
           "add a department", 
           "add a role", 
           "add an employee", 
-          "update an employee role"
+          "update an employee role",
+          "update an employee manager"
         ]
       }
     ])
@@ -225,7 +226,40 @@ db.then( connection => {
                 });
               });
             }
-          )
+          );
+
+        case "update an employee manager":
+          return dataAccess.getEmployees()
+          .then( employeeResults => {
+              const employees = employeeResults[0];
+              const employeeNames = [];
+              for (var i = 0; i < employees.length; i++) {
+                employeeNames.push(`${employees[i].first_name} ${employees[i].last_name}`);
+              }
+
+              return inquirer
+              .prompt([
+                {
+                  name:"employeeName", 
+                  message:"Select an employee to update:",
+                  type: "list",
+                  choices: employeeNames
+                },
+                {
+                  name:"managerName", 
+                  message:"Who is the employee's new manager?",
+                  type: "list",
+                  choices: employeeNames
+                },
+              ])
+              .then(answers => {
+                const employeeRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.employeeName);
+                const managerRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.managerName);
+                dataAccess.updateEmployeeManager(employeeRow.id, managerRow.id)
+                  .then(result => console.log(`Employee "${answers.employeeName}" has been updated.`));
+              });
+            }
+          );
 
       }
   
