@@ -48,7 +48,7 @@ db.then( connection => {
               
               console.log(table.toString());
             });
-          break;
+
         case "view all roles":
           return dataAccess.getRoles()
             .then(results => {
@@ -64,7 +64,7 @@ db.then( connection => {
               
               console.log(table.toString());
             });
-          break;
+
         case "view all employees":
           return dataAccess.getEmployees()
             .then(results => {
@@ -82,7 +82,7 @@ db.then( connection => {
               
               console.log(table.toString());
             });
-          break;
+
         case "add a department":
           return inquirer
             .prompt([
@@ -96,33 +96,47 @@ db.then( connection => {
               dataAccess.addDepartment(answers.departmentName)
                 .then(result => console.log(`Department "${answers.departmentName}" has been added.`));
             });
-          break;
+
         case "add a role":
-          return inquirer
-            .prompt([
-              {
-                name:"roleTitle", 
-                message:"What is the title of the role you want to add?",
-                type: "text"
-              },
-              {
-                name:"salary", 
-                message:"What is the salary of this role?",
-                type: "text"
-              },
-              {
-                name:"departmentId", 
-                message:"What is the ID of the department of this role?",
-                type: "text"
+          return dataAccess.getDepartments()
+          .then(
+            result => {
+              const departments = result[0];
+              const departmentNames = [];
+              for (var i = 0; i < departments.length; i++) {
+                departmentNames.push(departments[i].name);
               }
-            ])
-            .then(answers => {
-              dataAccess.addRole(answers.roleTitle, answers.salary, answers.departmentId)
-                .then(result => console.log(`Role "${answers.roleTitle}" has been added.`));
-            });
-          
+              return inquirer
+              .prompt([
+                {
+                  name:"roleTitle", 
+                  message:"What is the title of the role you want to add?",
+                  type: "text"
+                },
+                {
+                  name:"salary", 
+                  message:"What is the salary of this role?",
+                  type: "text"
+                },
+                {
+                  name:"departmentName", 
+                  message:"What is the department of this role?",
+                  type: "list",
+                  choices: departmentNames
+                }
+              ])
+              .then(answers => {
+                const departmentRow = departments.find(dept => dept.name === answers.departmentName);
+                dataAccess.addRole(answers.roleTitle, answers.salary, departmentRow.id)
+                  .then(result => console.log(`Role "${answers.roleTitle}" has been added.`));
+              });
+            }
+          )
+        
+
+
         case "add an employee":
-          break; 
+
         case "update an employee role":
           break;
       }
