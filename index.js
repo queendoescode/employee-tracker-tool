@@ -133,9 +133,57 @@ db.then( connection => {
             }
           )
         
-
-
         case "add an employee":
+          return dataAccess.getRoles()
+          .then( roleResults => {
+              return dataAccess.getEmployees()
+              .then( employeeResults => {
+                const roles = roleResults[0];
+                const roleTitles = [];
+                for (var i = 0; i < roles.length; i++) {
+                  roleTitles.push(roles[i].title);
+                }
+
+                const employees = employeeResults[0];
+                const employeeNames = [];
+                for (var i = 0; i < employees.length; i++) {
+                  employeeNames.push(`${employees[i].first_name} ${employees[i].last_name}`);
+                }
+
+                return inquirer
+                .prompt([
+                  {
+                    name:"firstName", 
+                    message:"What is the employee's first name?",
+                    type: "text"
+                  },
+                  {
+                    name:"lastName", 
+                    message:"What is the employee's last name?",
+                    type: "text"
+                  },
+                  {
+                    name:"roleTitle", 
+                    message:"What is the employee's role?",
+                    type: "list",
+                    choices: roleTitles
+                  },
+                  {
+                    name:"managerName", 
+                    message:"What is the employee's manager?",
+                    type: "list",
+                    choices: employeeNames
+                  }
+                ])
+                .then(answers => {
+                  const roleRow = roles.find(role => role.title === answers.roleTitle);
+                  const managerRow = employees.find(emp => `${emp.first_name} ${emp.last_name}` === answers.managerName);
+                  dataAccess.addEmployee(answers.firstName, answers.lastName, roleRow.id, managerRow.id)
+                    .then(result => console.log(`Employee "${answers.firstName} ${answers.lastName}" has been added.`));
+                });
+              })
+            }
+          )
 
         case "update an employee role":
           break;
