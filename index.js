@@ -3,6 +3,13 @@ const inquirer = require('inquirer');
 const Queries = require('./db/queries');
 const AsciiTable = require('ascii-table');
 
+/**
+ * This function is used to reformat database query results for `employee` table
+ * into the matrix expected by ascii-table. We use this in multiple places.
+ * 
+ * @param {*} results Query results returned from MySQL
+ * @param {*} tableTitle The main heading for ascii-table
+ */
 function formatEmployeeResults(results, tableTitle) {
   const matrix = [];
   for (var i = 0; i < results[0].length; i++) {
@@ -21,6 +28,16 @@ function formatEmployeeResults(results, tableTitle) {
 
 db.then( connection => {
   const dataAccess = new Queries(connection);
+
+  console.log(
+` _                                   
+|_ ._ _  ._  |  _      _   _         
+|_ | | | |_) | (_) \\/ (/_ (/_        
+___      |         /    ___          
+ | ._ _.  _ |   _  ._    |  _   _  | 
+ | | (_| (_ |< (/_ |     | (_) (_) |
+ 
+`);
   
   inquirer
     .prompt([
